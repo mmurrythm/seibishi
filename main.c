@@ -5,17 +5,17 @@
 #define BOARD_SIZE 10
 #define TILE_SIZE 32
 #define TILE_TYPES 4
-const char tile_chars[TILE_TYPES] = {' ', '#', '.', '$'}; // Empty, Wall, Goal, Box
+const char tileTypes[TILE_TYPES] = {' ', '#', '.', '$'}; // Empty, Wall, Goal, Box
 
 char board[BOARD_SIZE][BOARD_SIZE] ;
 
-char random_tile()
+char randomtile()
 {
     int r = GetRandomValue(0, TILE_TYPES - 1);
-    return tile_chars[r];
+    return tileTypes[r];
 }
 
-void init_board(void)
+void init_Board(void)
 {
     char level[BOARD_SIZE][BOARD_SIZE] =
     {
@@ -42,23 +42,20 @@ void init_board(void)
 
 int main(void)
 {
-    const int screenWidth = 800;
-    const int screenHeight = 800;
+    const int screenwidth = 800, screenheight = 800;
 
-    InitWindow(screenWidth, screenHeight, "Sokoban Game");
+    InitWindow(screenwidth, screenheight, "Sokoban Game");
     SetTargetFPS(60);
     SetRandomSeed((unsigned int)time(NULL)); // Seed the random number generator
-    init_board();
+    init_Board();
 
-    int playerX = 2;
-    int playerY = 2;
+    int playerX = 2, playerY = 2;
 
-    int movesCount = 0;
-    int boardWidth = BOARD_SIZE * TILE_SIZE;
-    int boardHeight = BOARD_SIZE * TILE_SIZE;
+    int movescount = 0;
+    int boardWidth = BOARD_SIZE * TILE_SIZE, boardHeight = BOARD_SIZE * TILE_SIZE;
 
-    int boardOffsetX = (screenWidth - boardWidth) / 2;
-    int boardOffsetY = (screenHeight - boardHeight) / 2;
+    int boardoffsetX = (screenwidth - boardWidth) / 2;
+    int boardoffsetY = (screenheight - boardHeight) / 2;
 
     while (!WindowShouldClose()) // game loop
     {
@@ -67,22 +64,22 @@ int main(void)
         if (IsKeyPressed(KEY_RIGHT) && board[playerY][playerX + 1] != '#')
         {
             playerX++;
-            movesCount++;
+            movescount++;
         }
         if (IsKeyPressed(KEY_LEFT) && board[playerY][playerX - 1] != '#')
         {
             playerX--;
-            movesCount++;
+            movescount++;
         }
         if (IsKeyPressed(KEY_UP) && board[playerY - 1][playerX] != '#')
         {
             playerY--;
-            movesCount++;
+            movescount++;
         }
         if (IsKeyPressed(KEY_DOWN) && board[playerY + 1][playerX] != '#')
         {
             playerY++;
-            movesCount++;
+            movescount++;
         }
 
         BeginDrawing();
@@ -96,8 +93,8 @@ int main(void)
             {
                 Rectangle rect =
                 {
-                    boardOffsetX + x * TILE_SIZE,
-                    boardOffsetY + y * TILE_SIZE,
+                    boardoffsetX + x * TILE_SIZE,
+                    boardoffsetY + y * TILE_SIZE,
                     TILE_SIZE,
                     TILE_SIZE
                 };
@@ -138,21 +135,21 @@ int main(void)
         }
         DrawCircle
         (
-            boardOffsetX + playerX * TILE_SIZE + TILE_SIZE / 2,
-            boardOffsetY + playerY * TILE_SIZE + TILE_SIZE / 2,
+            boardoffsetX + playerX * TILE_SIZE + TILE_SIZE / 2,
+            boardoffsetY + playerY * TILE_SIZE + TILE_SIZE / 2,
             10,
             BLUE
         );
+        
         int margin = 10;
-        int fontsize = 20;
+        int fontSize = 20;
         DrawText(
-            TextFormat("Moves: %d", movesCount),
+            TextFormat("Moves: %d", movescount ),
             margin,
-            screenHeight - fontsize - margin,
-            fontsize,
+            screenheight - fontSize - margin,
+            fontSize,
             BLACK
         );
-
 
         EndDrawing();
     }
