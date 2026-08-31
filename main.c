@@ -61,6 +61,19 @@ int main(void)
         {
             playerX++;
         }
+        if (IsKeyPressed(KEY_LEFT) && board[playerY][playerX - 1] != '#')
+        {
+            playerX--;
+        }
+        if (IsKeyPressed(KEY_UP) && board[playerY - 1][playerX] != '#')
+        {
+            playerY--;
+        }
+        if (IsKeyPressed(KEY_DOWN) && board[playerY + 1][playerX] != '#')
+        {
+            playerY++;
+        }
+
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
@@ -75,6 +88,24 @@ int main(void)
                     TILE_SIZE,
                     TILE_SIZE
                 };
+
+                //tile content drawing
+                if (board[y][x] == '#')
+                {
+                    DrawRectangleRec(rect, GRAY);
+                }
+                else if (board[y][x] == '.')
+                {
+                    DrawRectangleRec(rect, YELLOW);
+                }
+                else if (board[y][x] == '$')
+                {
+                    DrawRectangleRec(rect, BROWN);
+                }
+                else
+                {
+                    DrawRectangleRec(rect, RAYWHITE);
+                }
 
                 DrawRectangleLinesEx(rect, 1, BLACK);
 
