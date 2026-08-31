@@ -143,13 +143,16 @@ int main(void)
             10,
             BLUE
         );
+        int margin = 10;
+        int fontsize = 20;
         DrawText(
             TextFormat("Moves: %d", movesCount),
-            boardOffsetX + 10,
-            boardOffsetY + boardHeight  - 30,
-            20,
+            margin,
+            screenHeight - fontsize - margin,
+            fontsize,
             BLACK
         );
+
 
         EndDrawing();
     }
