@@ -23,14 +23,14 @@ void init_board(void)
         "#        #",
         "#   $ .  #",
         "#        #",
+        "#   .    #",
+        "#  #     #",
         "#        #",
         "#        #",
-        "#        #",
-        "#        #",
-        "#        #",
+        "#      # #",
         "##########"
     };
-
+    //tile screen position = board offset + grid position × tile size
     for (int y = 0; y < BOARD_SIZE; y++)
     {
         for (int x = 0; x < BOARD_SIZE; x++)
@@ -43,7 +43,7 @@ void init_board(void)
 int main(void)
 {
     const int screenWidth = 800;
-    const int screenHeight = 600;
+    const int screenHeight = 800;
 
     InitWindow(screenWidth, screenHeight, "Sokoban Game");
     SetTargetFPS(60);
@@ -53,6 +53,13 @@ int main(void)
     int playerX = 2;
     int playerY = 2;
 
+    int movesCount = 0;
+    int boardWidth = BOARD_SIZE * TILE_SIZE;
+    int boardHeight = BOARD_SIZE * TILE_SIZE;
+
+    int boardOffsetX = (screenWidth - boardWidth) / 2;
+    int boardOffsetY = (screenHeight - boardHeight) / 2;
+
     while (!WindowShouldClose()) // game loop
     {
 
@@ -60,22 +67,28 @@ int main(void)
         if (IsKeyPressed(KEY_RIGHT) && board[playerY][playerX + 1] != '#')
         {
             playerX++;
+            movesCount++;
         }
         if (IsKeyPressed(KEY_LEFT) && board[playerY][playerX - 1] != '#')
         {
             playerX--;
+            movesCount++;
         }
         if (IsKeyPressed(KEY_UP) && board[playerY - 1][playerX] != '#')
         {
             playerY--;
+            movesCount++;
         }
         if (IsKeyPressed(KEY_DOWN) && board[playerY + 1][playerX] != '#')
         {
             playerY++;
+            movesCount++;
         }
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
+
+
 
         for (int y = 0; y < BOARD_SIZE; y++) //nested drawing loops
         {
@@ -83,8 +96,8 @@ int main(void)
             {
                 Rectangle rect =
                 {
-                    x * TILE_SIZE,
-                    y * TILE_SIZE,
+                    boardOffsetX + x * TILE_SIZE,
+                    boardOffsetY + y * TILE_SIZE,
                     TILE_SIZE,
                     TILE_SIZE
                 };
@@ -125,10 +138,17 @@ int main(void)
         }
         DrawCircle
         (
-            playerX * TILE_SIZE + TILE_SIZE / 2,
-            playerY * TILE_SIZE + TILE_SIZE / 2,
+            boardOffsetX + playerX * TILE_SIZE + TILE_SIZE / 2,
+            boardOffsetY + playerY * TILE_SIZE + TILE_SIZE / 2,
             10,
             BLUE
+        );
+        DrawText(
+            TextFormat("Moves: %d", movesCount),
+            boardOffsetX + 10,
+            boardOffsetY + boardHeight  - 30,
+            20,
+            BLACK
         );
 
         EndDrawing();
