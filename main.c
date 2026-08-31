@@ -50,14 +50,21 @@ int main(void)
     SetRandomSeed((unsigned int)time(NULL)); // Seed the random number generator
     init_board();
 
-    while (!WindowShouldClose())
+    int playerX = 2;
+    int playerY = 2;
+
+    while (!WindowShouldClose()) // game loop
     {
 
         // Update game logic here
+        if (IsKeyPressed(KEY_RIGHT) && board[playerY][playerX + 1] != '#')
+        {
+            playerX++;
+        }
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        for (int y = 0; y < BOARD_SIZE; y++)
+        for (int y = 0; y < BOARD_SIZE; y++) //nested drawing loops
         {
             for (int x = 0; x < BOARD_SIZE; x++)
             {
@@ -85,6 +92,13 @@ int main(void)
                 // DrawText(&board[y][x], x * TILE_SIZE, y * TILE_SIZE, 20, BLACK);
             }
         }
+        DrawCircle
+        (
+            playerX * TILE_SIZE + TILE_SIZE / 2,
+            playerY * TILE_SIZE + TILE_SIZE / 2,
+            10,
+            BLUE
+        );
 
         EndDrawing();
     }
