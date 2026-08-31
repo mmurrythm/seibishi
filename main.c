@@ -15,13 +15,27 @@ char random_tile()
     return tile_chars[r];
 }
 
-void init_board()
+void init_board(void)
 {
+    char level[BOARD_SIZE][BOARD_SIZE] =
+    {
+        "##########",
+        "#        #",
+        "#   $ .  #",
+        "#        #",
+        "#        #",
+        "#        #",
+        "#        #",
+        "#        #",
+        "#        #",
+        "##########"
+    };
+
     for (int y = 0; y < BOARD_SIZE; y++)
     {
         for (int x = 0; x < BOARD_SIZE; x++)
         {
-            board[y][x] = random_tile();
+            board[y][x] = level[y][x];
         }
     }
 }
