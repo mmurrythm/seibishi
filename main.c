@@ -1,3 +1,5 @@
+// refrerence https://youtu.be/P7PMA3X1tf8?si=5vKgEPFMyzi640u6
+
 #include"raylib.h"
 #include <stdlib.h>
 #include <time.h>
@@ -61,30 +63,36 @@ int main(void)
     {
 
         // Update game logic here
-        if (IsKeyPressed(KEY_RIGHT) && board[playerY][playerX + 1] != '#')
+        
+        int moveX = 0, moveY = 0;
+        
+
+        if (IsKeyPressed(KEY_RIGHT)) moveX = 1;
+        else if (IsKeyPressed(KEY_LEFT)) moveX = -1;
+        else if (IsKeyPressed(KEY_UP)) moveY = -1;
+        else if (IsKeyPressed(KEY_DOWN)) moveY = 1;
+
+        
+
+        if (moveX != 0 || moveY != 0) //ensure pressing for movement
         {
-            playerX++;
-            movescount++;
+            int nextX = playerX + moveX, nextY = playerY + moveY;
+            if (nextX >= 0 && nextX < BOARD_SIZE && nextY >= 0 && nextY < BOARD_SIZE)
+            {
+                if(board[nextY][nextX] != '#')
+                {
+                    playerX = nextX;
+                    playerY = nextY;
+                    movescount++;
+                }
+                
+            }
         }
-        if (IsKeyPressed(KEY_LEFT) && board[playerY][playerX - 1] != '#')
-        {
-            playerX--;
-            movescount++;
-        }
-        if (IsKeyPressed(KEY_UP) && board[playerY - 1][playerX] != '#')
-        {
-            playerY--;
-            movescount++;
-        }
-        if (IsKeyPressed(KEY_DOWN) && board[playerY + 1][playerX] != '#')
-        {
-            playerY++;
-            movescount++;
-        }
+
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
-
+        
 
 
         for (int y = 0; y < BOARD_SIZE; y++) //nested drawing loops
