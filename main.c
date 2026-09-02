@@ -251,6 +251,12 @@ int main(void)
 
     InitWindow(screenwidth, screenheight, "Sokoban Game");
     SetTargetFPS(60);
+    Texture2D floorTexture = LoadTexture("texture/floor.png");
+    Texture2D wallTexture = LoadTexture("texture/wall.png");
+    Texture2D goalTexture = LoadTexture("texture/goal.png");
+    Texture2D boxTexture = LoadTexture("texture/box.png");
+    Texture2D playerTexture = LoadTexture("texture/player.png");
+    Texture2D boxOnGoalTexture = LoadTexture("texture/box_goal.png");
     int levelNum = 1;
 
     init_Board(levelNum);
@@ -383,37 +389,37 @@ int main(void)
                 // tile content drawing
                 if (board[y][x] == '#')
                 {
-                    DrawRectangleRec(rect, DARKBLUE);
+                    DrawTexture(wallTexture, rect.x, rect.y, WHITE);
                 }
                 else if (board[y][x] == '.')
                 {
-                    DrawRectangleRec(rect, YELLOW);
+                    DrawTexture(goalTexture, rect.x, rect.y, WHITE);
                 }
                 else if (board[y][x] == '$')
                 {
                     if(goals[y][x] == '.')
                     {
-                        DrawRectangleRec(rect, GREEN);
+                        DrawTexture(boxOnGoalTexture, rect.x, rect.y, WHITE);
                     }
                     else
                     {
-                        DrawRectangleRec(rect, PINK);
+                        DrawTexture(boxTexture, rect.x, rect.y, WHITE);
                     }
                 }
                 else
                 {
-                    DrawRectangleRec(rect, BLACK);
+                    DrawTexture(floorTexture, rect.x, rect.y, WHITE);
                 }
 
                 DrawRectangleLinesEx(rect, 1, DARKGRAY);
 
-                DrawTextEx(GetFontDefault(), TextFormat("%c", board[y][x]), (Vector2)
+                /*DrawTextEx(GetFontDefault(), TextFormat("%c", board[y][x]), (Vector2)
                 {
                     rect.x + 12, rect.y + 6
-                }, 24, 1, RAYWHITE);
+                }, 24, 1, RAYWHITE);*/
             }
         }
-        DrawCircle(boardoffsetX + playerX * 32 + 32 / 2, boardoffsetY + playerY * 32 + 32 / 2, 10, RED);
+        DrawTexture(playerTexture, boardoffsetX + playerX * 32, boardoffsetY + playerY * 32, WHITE);
 
         int margin = 10;
         int fontSize = 20;
