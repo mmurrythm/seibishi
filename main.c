@@ -28,7 +28,7 @@ void init_Board(void)
             "#        #",
             "#   .    #",
             "#  #     #",
-            "#        #",
+            "#  $     #",
             "#        #",
             "#      # #",
             "##########"};
@@ -73,24 +73,33 @@ int main(void)
         }
     }
 
-
-    while (!WindowShouldClose()) // game loop
+    // while game loop
+    int gamewon = 0;
+    while (!WindowShouldClose()) 
     {
 
         // Update game logic here
+        if (IsKeyPressed(KEY_R))
+        {
+            init_Board();
+            playerX = 2;
+            playerY = 2;
+            movescount = 0;
+            gamewon = 0;
+        }
 
         int moveX = 0, moveY = 0;
 
-        if (IsKeyPressed(KEY_RIGHT))
+        if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D))
             moveX = 1;
-        else if (IsKeyPressed(KEY_LEFT))
+        else if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A))
             moveX = -1;
-        else if (IsKeyPressed(KEY_UP))
+        else if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
             moveY = -1;
-        else if (IsKeyPressed(KEY_DOWN))
+        else if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
             moveY = 1;
 
-        if (moveX != 0 || moveY != 0) // ensure pressing for movement
+        if ((moveX != 0 || moveY != 0) && gamewon == 0 && IsKeyPressed(KEY_R)) // ensure pressing for movement
         {
             int nextX = playerX + moveX, nextY = playerY + moveY;
             if (nextX >= 0 && nextX < BOARD_SIZE && nextY >= 0 && nextY < BOARD_SIZE)
@@ -143,7 +152,7 @@ int main(void)
 
         if(goalCount == totalcount)
         {
-            DrawText("YOU WIN!", screenwidth / 2 - 100, screenheight / 2 - 20, 40, GREEN);
+            gamewon = 1;
         }
 
         BeginDrawing();
@@ -197,9 +206,16 @@ int main(void)
         int margin = 10;
         int fontSize = 20;
         DrawText(TextFormat("MOVES: %d", movescount), margin, screenheight - fontSize - margin, fontSize, BLACK);
-        DrawText(TextFormat("GOALS: %d", goalCount), margin, screenheight - fontSize - margin - 25, fontSize, BLACK);
+        DrawText(TextFormat("GOALS: %d / %d", goalCount, totalcount), margin, screenheight - fontSize - margin - 25, fontSize, BLACK);
+        
+        if(gamewon == 1)
+        {
+            DrawRectangle(250, 05, 295, 45, RED);
+            DrawText("YOU WIN!", 300, 10, 40, GREEN); // center of the screen (400,400)
+        }
+  
         EndDrawing();
-    }
+    } 
 
     CloseWindow();
     return 0;
