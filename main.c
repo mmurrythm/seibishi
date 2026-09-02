@@ -79,7 +79,11 @@ int main(void)
             int nextX = playerX + moveX, nextY = playerY + moveY;
             if (nextX >= 0 && nextX < BOARD_SIZE && nextY >= 0 && nextY < BOARD_SIZE)
             {
-                if(board[nextY][nextX] != '#')
+                if(board[nextY][nextX] != '$')
+                {
+                    //detect box
+                }
+                else if(board[nextY][nextX] != '#')
                 {
                     playerX = nextX;
                     playerY = nextY;
