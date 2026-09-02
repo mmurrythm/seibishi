@@ -1,16 +1,16 @@
 // refrerence https://youtu.be/P7PMA3X1tf8?si=5vKgEPFMyzi640u6
 
 #include "raylib.h"
-#include <stdlib.h>
-#include <time.h>
 
 #define BOARD_SIZE 16
-#define TILE_SIZE 32
 #define TILE_TYPES 4
 const char tileTypes[TILE_TYPES] = {' ', '#', '.', '$'}; // Empty, Wall, Goal, Box
 
 char board[BOARD_SIZE][BOARD_SIZE];
 char goals[BOARD_SIZE][BOARD_SIZE];
+
+int playerStartsX[10] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+int playerStartsY[10] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
 
 void init_Board(int levelNum)
 {
@@ -99,9 +99,9 @@ void init_Board(int levelNum)
         "#  $  #   .    #",
         "#     #        #",
         "# ### #####    #",
-        "#   #         #",
-        "#   #   .    #",
-        "#   #       #",
+        "#   #         ##",
+        "#   #   .    # #",
+        "#   #       #  #",
         "#   ##### ###  #",
         "#       $      #",
         "#              #",
@@ -229,6 +229,22 @@ void init_Board(int levelNum)
     }
 }
 
+int countGoals()
+{
+    int count = 0;
+    for (int y = 0; y < BOARD_SIZE; y++)
+    {
+        for (int x = 0; x < BOARD_SIZE; x++)
+        {
+            if (goals[y][x] == '.')
+            {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
 int main(void)
 {
     const int screenwidth = 800, screenheight = 800;
@@ -239,39 +255,28 @@ int main(void)
 
     init_Board(levelNum);
 
-    //game variables
-    int playerX = 2, playerY = 2;
+    int playerX = playerStartsX[levelNum - 1], playerY = playerStartsY[levelNum - 1];
     int movescount = 0;
     
-    int boardWidth = BOARD_SIZE * TILE_SIZE, boardHeight = BOARD_SIZE * TILE_SIZE;
+    int boardWidth = BOARD_SIZE * 32, boardHeight = BOARD_SIZE * 32;
 
     int boardoffsetX = (screenwidth - boardWidth) / 2;
     int boardoffsetY = (screenheight - boardHeight) / 2;
 
-    int goalCount = 0, totalcount = 0;
+    int goalCount = 0;
+    int totalcount = countGoals();
 
-    for (int y = 0; y < BOARD_SIZE; y++)
-    {
-        for (int x = 0; x < BOARD_SIZE; x++)
-        {
-            if (goals[y][x] == '.')
-            {
-                totalcount++;
-            }
-        }
-    }
-
-    // while game loop
     int gamewon = 0;
     while (!WindowShouldClose())
     {
+        // if movement then if inside board and not wall then move player, if box then check if box can be moved, if yes then move box and player, if no then do nothing
 
-        // Update game logic here
         if (IsKeyPressed(KEY_R))
         {
             init_Board(levelNum);
-            playerX = 2;
-            playerY = 2;
+            totalcount = countGoals();
+            playerX = playerStartsX[levelNum - 1];
+            playerY = playerStartsY[levelNum - 1];
             movescount = 0;
             gamewon = 0;
         }
@@ -294,14 +299,12 @@ int main(void)
             {
                 if (board[nextY][nextX] == '$')
                 {
-                    // detect box
                     int boxNextX = nextX + moveX, boxNextY = nextY + moveY;
                     if (boxNextX >= 0 && boxNextX < BOARD_SIZE && boxNextY >= 0 && boxNextY < BOARD_SIZE)
                     {
                         // check before boxes
                         if (board[boxNextY][boxNextX] != '#' && board[boxNextY][boxNextX] != '$')
                         {
-                            // push box
                             board[boxNextY][boxNextX] = '$';
                             if(goals[nextY][nextX] == '.')
                             {
@@ -343,25 +346,44 @@ int main(void)
             gamewon = 1;
         }
 
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
+        if(gamewon ==1 && IsKeyPressed(KEY_ENTER))
+        {
+            levelNum++;
+            if(levelNum > 10)
+            {
+                levelNum = 1;
+            }
+            init_Board(levelNum);
+            totalcount = countGoals();
+            playerX = playerStartsX[levelNum - 1];
+            playerY = playerStartsY[levelNum - 1];
+            movescount = 0;
+            gamewon = 0;
+        }
 
-        for (int y = 0; y < BOARD_SIZE; y++) // nested drawing loops
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        //nested loops go through each tile of board
+        // y = row, x = column
+        //then create a Rectangle at that tile’s screen position so its contents can be drawn.
+
+        for (int y = 0; y < BOARD_SIZE; y++) 
         {
             for (int x = 0; x < BOARD_SIZE; x++)
             {
                 Rectangle rect =
                 {
-                    boardoffsetX + x * TILE_SIZE,
-                    boardoffsetY + y * TILE_SIZE,
-                    TILE_SIZE,
-                    TILE_SIZE
+                    boardoffsetX + x * 32,
+                    boardoffsetY + y * 32,
+                    32,
+                    32
                 };
 
                 // tile content drawing
                 if (board[y][x] == '#')
                 {
-                    DrawRectangleRec(rect, GRAY);
+                    DrawRectangleRec(rect, DARKBLUE);
                 }
                 else if (board[y][x] == '.')
                 {
@@ -375,42 +397,39 @@ int main(void)
                     }
                     else
                     {
-                        DrawRectangleRec(rect, BROWN);
+                        DrawRectangleRec(rect, PINK);
                     }
                 }
                 else
                 {
-                    DrawRectangleRec(rect, RAYWHITE);
+                    DrawRectangleRec(rect, BLACK);
                 }
 
-                DrawRectangleLinesEx(rect, 1, BLACK);
+                DrawRectangleLinesEx(rect, 1, DARKGRAY);
 
                 DrawTextEx(GetFontDefault(), TextFormat("%c", board[y][x]), (Vector2)
                 {
                     rect.x + 12, rect.y + 6
-                }, 24, 1, BLACK);
-                // DrawText(&board[y][x], x * TILE_SIZE, y * TILE_SIZE, 20, BLACK);
+                }, 24, 1, RAYWHITE);
             }
         }
-        DrawCircle(boardoffsetX + playerX * TILE_SIZE + TILE_SIZE / 2, boardoffsetY + playerY * TILE_SIZE + TILE_SIZE / 2, 10, BLUE);
+        DrawCircle(boardoffsetX + playerX * 32 + 32 / 2, boardoffsetY + playerY * 32 + 32 / 2, 10, RED);
 
         int margin = 10;
         int fontSize = 20;
-        DrawText("MOVE: WASD / ARROWS", margin, margin, 20, BLACK);
-        DrawText("RESET: R", margin, margin + 25, 20, BLACK);
+        DrawText("MOVE: WASD / ARROWS", margin, margin, 20, RAYWHITE);
+        DrawText("RESET: R", margin, margin + 25, 20, RAYWHITE);
 
-        DrawText(TextFormat("MOVES: %d", movescount), margin, screenheight - fontSize - margin, fontSize, BLACK);
-        DrawText(TextFormat("GOALS: %d / %d", goalCount, totalcount), margin, screenheight - fontSize - margin - 25, fontSize, BLACK);
-
+        DrawText(TextFormat("MOVES: %d", movescount), margin, screenheight - fontSize - margin, fontSize, RAYWHITE);
+        DrawText(TextFormat("GOALS: %d / %d", goalCount, totalcount), margin, screenheight - fontSize - margin - 25, fontSize, RAYWHITE);
+        DrawText(TextFormat("LEVEL: %d", levelNum), margin, screenheight - fontSize - margin - 50, fontSize, RAYWHITE);
         if(gamewon == 1)
         {
-            DrawRectangle(250, 05, 295, 45, RED);
-            DrawText("YOU WIN!", 300, 10, 40, GREEN); // center of the screen (400,400)
+            DrawRectangle(265, 20, 265, 60, BEIGE);
+            DrawText("YOU WIN!", 300, 30, 40, DARKGREEN); // center of screen (400,400)
         }
-
         EndDrawing();
     }
-
     CloseWindow();
     return 0;
 }
