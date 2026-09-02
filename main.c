@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define BOARD_SIZE 10
+#define BOARD_SIZE 16
 #define TILE_SIZE 32
 #define TILE_TYPES 4
 const char tileTypes[TILE_TYPES] = {' ', '#', '.', '$'}; // Empty, Wall, Goal, Box
@@ -18,21 +18,52 @@ char randomtile()
     return tileTypes[r];
 }
 
-void init_Board(void)
+void init_Board(int levelnum)
 {
-    char level[BOARD_SIZE][BOARD_SIZE] =
+    //from line 24 to 62, we defined layout
+    char level1[BOARD_SIZE][BOARD_SIZE] =
         {
-            "##########",
-            "#        #",
-            "#   $ .  #",
-            "#        #",
-            "#   .    #",
-            "#  #     #",
-            "#  $     #",
-            "#        #",
-            "#      # #",
-            "##########"};
+            "################",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "################"
+            
+        };
+    char level2[BOARD_SIZE][BOARD_SIZE] =
+        {
+            "################",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "#              #",
+            "################"
+};
     // tile screen position = board offset + grid position × tile size
+
+    char (*level)[BOARD_SIZE] = (levelnum == 1) ? level1 : level2;
+
     for (int y = 0; y < BOARD_SIZE; y++)
     {
         for (int x = 0; x < BOARD_SIZE; x++)
@@ -50,9 +81,11 @@ int main(void)
     InitWindow(screenwidth, screenheight, "Sokoban Game");
     SetTargetFPS(60);
     SetRandomSeed((unsigned int)time(NULL)); // Seed the random number generator
-    init_Board();
+    init_Board(1);
 
+    //game variables
     int playerX = 2, playerY = 2;
+    int levelnum = 1;
 
     int movescount = 0;
     int boardWidth = BOARD_SIZE * TILE_SIZE, boardHeight = BOARD_SIZE * TILE_SIZE;
@@ -81,7 +114,7 @@ int main(void)
         // Update game logic here
         if (IsKeyPressed(KEY_R))
         {
-            init_Board();
+            init_Board(levelnum);
             playerX = 2;
             playerY = 2;
             movescount = 0;
@@ -99,7 +132,7 @@ int main(void)
         else if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
             moveY = 1;
 
-        if ((moveX != 0 || moveY != 0) && gamewon == 0 && IsKeyPressed(KEY_R)) // ensure pressing for movement
+        if ((moveX != 0 || moveY != 0) && gamewon == 0 && !IsKeyPressed(KEY_R)) // ensure pressing for movement
         {
             int nextX = playerX + moveX, nextY = playerY + moveY;
             if (nextX >= 0 && nextX < BOARD_SIZE && nextY >= 0 && nextY < BOARD_SIZE)
@@ -205,6 +238,9 @@ int main(void)
 
         int margin = 10;
         int fontSize = 20;
+        DrawText("MOVE: WASD / ARROWS", margin, margin, 20, BLACK);
+        DrawText("RESET: R", margin, margin + 25, 20, BLACK);
+
         DrawText(TextFormat("MOVES: %d", movescount), margin, screenheight - fontSize - margin, fontSize, BLACK);
         DrawText(TextFormat("GOALS: %d / %d", goalCount, totalcount), margin, screenheight - fontSize - margin - 25, fontSize, BLACK);
         
