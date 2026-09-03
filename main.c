@@ -249,15 +249,20 @@ int main(void)
 {
     const int screenwidth = 800, screenheight = 800;
 
-    InitWindow(screenwidth, screenheight, "Sokoban Game");
+    InitWindow(screenwidth, screenheight, "SEIBISHI");
     SetTargetFPS(60);
+
+    //texture/pngfiles
     Texture2D floorTexture = LoadTexture("texture/floor.png");
     Texture2D wallTexture = LoadTexture("texture/wall.png");
     Texture2D goalTexture = LoadTexture("texture/goal.png");
     Texture2D boxTexture = LoadTexture("texture/box.png");
     Texture2D playerTexture = LoadTexture("texture/player.png");
     Texture2D boxOnGoalTexture = LoadTexture("texture/box_goal.png");
+    Texture2D winTexture = LoadTexture("texture/win.png");
+    Texture2D menubgTexture = LoadTexture("texture/menubg.png");
     int levelNum = 1;
+    int menu = 1;
 
     init_Board(levelNum);
 
@@ -275,6 +280,61 @@ int main(void)
     int gamewon = 0;
     while (!WindowShouldClose())
     {
+        if(menu == 1)
+        {
+            BeginDrawing();
+            ClearBackground(BLACK);
+
+            DrawTexture(menubgTexture, 0, 0, WHITE);
+
+            DrawText("THE SEIBISHI", 245, 200, 40, BLACK);
+            DrawRectangle(245, 260, 280, 3, RAYWHITE);
+            DrawText("10 LEVELS", 330, 240, 20, DARKGRAY);
+
+            //DrawRectangle(280, 270, 240, 3, RAYWHITE);
+
+            DrawText("Press ENTER to Start", 255, 350, 17, BLACK);
+            DrawText("Press ESC TO QUIT", 255, 400, 17, BLACK);
+            DrawText("Press I to Instructions", 255, 450, 17, BLACK); 
+            EndDrawing();
+
+            if(IsKeyPressed(KEY_ENTER))
+            {
+                menu = 0;
+            }
+            if(IsKeyPressed(KEY_ESCAPE))
+            {
+                break;
+            }
+            if(IsKeyPressed(KEY_I))
+            {
+                menu = 2;
+            }
+            continue;
+        }
+
+        if(menu == 2)
+        {
+            BeginDrawing();
+            ClearBackground(BLACK);
+
+            DrawTexture(menubgTexture, 0, 0, WHITE);
+
+            DrawText("INSTRUCTIONS", 245, 200, 30, BLACK);
+            DrawRectangle(245, 260, 280, 3, RAYWHITE);
+            //DrawRectangle(280, 270, 240, 3, RAYWHITE);
+
+            DrawText("Move: WASD / ARROWS", 255, 350, 17, BLACK);
+            DrawText("Reset: R", 255, 400, 17, BLACK);
+            DrawText("Press M TO GO BACK", 255, 450, 17, BLACK); 
+            EndDrawing();
+
+            if(IsKeyPressed(KEY_M))
+            {
+                menu = 1;
+            }
+            continue;
+        }
         // if movement then if inside board and not wall then move player, if box then check if box can be moved, if yes then move box and player, if no then do nothing
 
         if (IsKeyPressed(KEY_R))
@@ -423,16 +483,16 @@ int main(void)
 
         int margin = 10;
         int fontSize = 20;
-        DrawText("MOVE: WASD / ARROWS", margin, margin, 20, RAYWHITE);
+        DrawText("MOVE: WASD / ARROWS", margin, margin, 20, GREEN);
         DrawText("RESET: R", margin, margin + 25, 20, RAYWHITE);
 
         DrawText(TextFormat("MOVES: %d", movescount), margin, screenheight - fontSize - margin, fontSize, RAYWHITE);
         DrawText(TextFormat("GOALS: %d / %d", goalCount, totalcount), margin, screenheight - fontSize - margin - 25, fontSize, RAYWHITE);
-        DrawText(TextFormat("LEVEL: %d", levelNum), margin, screenheight - fontSize - margin - 50, fontSize, RAYWHITE);
+        DrawText(TextFormat("LEVEL: %d", levelNum), margin, screenheight - fontSize - margin - 50, fontSize, BLUE);
         if(gamewon == 1)
         {
-            DrawRectangle(265, 20, 265, 60, BEIGE);
-            DrawText("YOU WIN!", 300, 30, 40, DARKGREEN); // center of screen (400,400)
+            DrawTexture(winTexture, 179, 40, WHITE);
+            //DrawText("MISSION COMPLETE!", 245, 30, 20, RAYWHITE); // center of screen (400,400)
         }
         EndDrawing();
     }
