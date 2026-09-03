@@ -1,3 +1,5 @@
+// refrerence https://youtu.be/P7PMA3X1tf8?si=5vKgEPFMyzi640u6
+
 #include "raylib.h"
 
 #define BOARD_SIZE 16
@@ -409,12 +411,15 @@ int main(void)
                 levelNum = 10;
                 gamewon = 2;
             }
-            init_Board(levelNum);
-            totalcount = countGoals();
-            playerX = playerStartsX[levelNum - 1];
-            playerY = playerStartsY[levelNum - 1];
-            movescount = 0;
-            gamewon = 0;
+            else
+            {
+                init_Board(levelNum);
+                totalcount = countGoals();
+                playerX = playerStartsX[levelNum - 1];
+                playerY = playerStartsY[levelNum - 1];
+                movescount = 0;
+                gamewon = 0;
+            }
         }
 
         BeginDrawing();
