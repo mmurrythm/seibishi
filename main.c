@@ -1,5 +1,3 @@
-// refrerence https://youtu.be/P7PMA3X1tf8?si=5vKgEPFMyzi640u6
-
 #include "raylib.h"
 
 #define BOARD_SIZE 16
@@ -78,11 +76,11 @@ void init_Board(int levelNum)
         "################",
         "#              #",
         "#   ####       #",
-        "#   #  .#      #",
+        "#   # . #      #",
         "#   #   #      #",
         "#   #   ####   #",
         "#   #      .   #",
-        "#   ######     #",
+        "#   #  #####   #",
         "#              #",
         "#      $       #",
         "#              #",
@@ -134,8 +132,8 @@ void init_Board(int levelNum)
     {
         "################",
         "#              #",
-        "#  $      # .  #",
-        "#          #   #",
+        "#  $        .  #",
+        "#         #    #",
         "#  ####    #   #",
         "#     #    ### #",
         "#  .  #        #",
@@ -143,9 +141,9 @@ void init_Board(int levelNum)
         "#              #",
         "#     $        #",
         "#   ########   #",
-        "#              #",
-        "#              #",
-        "#              #",
+        "#       #      #",
+        "#       #      #",
+        "#       #      #",
         "#              #",
         "################"
     };
@@ -180,10 +178,10 @@ void init_Board(int levelNum)
         "#       .      #",
         "#              #",
         "#       ####   #",
-        "#          $   #",
+        "#   $      $   #",
         "#              #",
         "#   #######    #",
-        "#              #",
+        "#    .         #",
         "#              #",
         "################"
     };
@@ -199,10 +197,10 @@ void init_Board(int levelNum)
         "#   .      $   #",
         "#              #",
         "#    #####     #",
-        "#              #",
+        "#          $   #",
         "#  #######     #",
         "#              #",
-        "#       #      #",
+        "#  .    #      #",
         "#              #",
         "################"
     };
@@ -252,7 +250,7 @@ int main(void)
     InitWindow(screenwidth, screenheight, "SEIBISHI");
     SetTargetFPS(60);
 
-    //texture/pngfiles
+    //texture/.pngfiles
     Texture2D floorTexture = LoadTexture("texture/floor.png");
     Texture2D wallTexture = LoadTexture("texture/wall.png");
     Texture2D goalTexture = LoadTexture("texture/goal.png");
@@ -261,6 +259,8 @@ int main(void)
     Texture2D boxOnGoalTexture = LoadTexture("texture/box_goal.png");
     Texture2D winTexture = LoadTexture("texture/win.png");
     Texture2D menubgTexture = LoadTexture("texture/menubg.png");
+    Texture2D instructionbgTexture = LoadTexture("texture/instructions.png");
+    Texture2D gameoverTexture = LoadTexture("texture/gameover.png");
     int levelNum = 1;
     int menu = 1;
 
@@ -287,15 +287,6 @@ int main(void)
 
             DrawTexture(menubgTexture, 0, 0, WHITE);
 
-            DrawText("THE SEIBISHI", 245, 200, 40, BLACK);
-            DrawRectangle(245, 260, 280, 3, RAYWHITE);
-            DrawText("10 LEVELS", 330, 240, 20, DARKGRAY);
-
-            //DrawRectangle(280, 270, 240, 3, RAYWHITE);
-
-            DrawText("Press ENTER to Start", 255, 350, 17, BLACK);
-            DrawText("Press ESC TO QUIT", 255, 400, 17, BLACK);
-            DrawText("Press I to Instructions", 255, 450, 17, BLACK); 
             EndDrawing();
 
             if(IsKeyPressed(KEY_ENTER))
@@ -318,17 +309,9 @@ int main(void)
             BeginDrawing();
             ClearBackground(BLACK);
 
-            DrawTexture(menubgTexture, 0, 0, WHITE);
+            DrawTexture(instructionbgTexture, 0, 0, WHITE);
 
-            DrawText("INSTRUCTIONS", 245, 200, 30, BLACK);
-            DrawRectangle(245, 260, 280, 3, RAYWHITE);
-            //DrawRectangle(280, 270, 240, 3, RAYWHITE);
-
-            DrawText("Move: WASD / ARROWS", 255, 350, 17, BLACK);
-            DrawText("Reset: R", 255, 400, 17, BLACK);
-            DrawText("Press M TO GO BACK", 255, 450, 17, BLACK); 
             EndDrawing();
-
             if(IsKeyPressed(KEY_M))
             {
                 menu = 1;
@@ -411,13 +394,20 @@ int main(void)
         {
             gamewon = 1;
         }
+        if(IsKeyPressed(KEY_M))
+        {
+            menu = 1;
+
+        }
+        
 
         if(gamewon ==1 && IsKeyPressed(KEY_ENTER))
         {
             levelNum++;
-            if(levelNum > 10)
+            if(levelNum == 11)
             {
-                levelNum = 1;
+                levelNum = 10;
+                gamewon = 2;
             }
             init_Board(levelNum);
             totalcount = countGoals();
@@ -491,10 +481,17 @@ int main(void)
         DrawText(TextFormat("LEVEL: %d", levelNum), margin, screenheight - fontSize - margin - 50, fontSize, BLUE);
         if(gamewon == 1)
         {
-            DrawTexture(winTexture, 179, 40, WHITE);
+            DrawTexture(winTexture, 170, 40, WHITE);
             //DrawText("MISSION COMPLETE!", 245, 30, 20, RAYWHITE); // center of screen (400,400)
         }
         EndDrawing();
+        if(gamewon == 2)
+        {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            DrawTexture(gameoverTexture, 0, 0, WHITE);
+            EndDrawing();
+        }
     }
     CloseWindow();
     return 0;
