@@ -36,15 +36,14 @@ SEIBISHI is designed around a balance between careful planning and movement. A p
 ### Credits
 
 **Students**
-- [2505139]()
+- [2505139](https://github.com/mmurrythm)
 - [2505124]
 
 **Advisor**
 - [Junaed Younus Khan Sir](https://www.junaedyounuskhan.com/)
 
 **Game Library**
-- Raylib
+- [Raylib](https://www.raylib.com/)
 
 **External Source**
-- OpenGameArt.org  
-  https://opengameart.org/
+- [OpenGameArt.org](https://opengameart.org/)
