@@ -1,59 +1,50 @@
 # SEIBISHI
 
-**SEIBISHI** is a 10-level sci-fi Sokoban puzzle game written in C using raylib.
+## Introduction
 
-The player moves around a 16×16 grid, pushes boxes, and tries to place every box on a goal.
+**SEIBISHI** is a space-themed Sokoban-inspired puzzle game built with **Raylib** and C.
 
-The project combines classic Sokoban gameplay with a custom sci-fi visual style and hand-made pixel-art textures.
+The player must navigate through a series of increasingly challenging levels, push objects onto their designated goals, avoid moving enemies, and manage their limited hearts while trying to achieve the highest possible score.
 
-## Features
+The game combines classic grid-based puzzle mechanics with an enemy system that introduces an additional layer of pressure. As the player progresses through the levels, the difficulty increases through both **level-based progression** and **progressive enemy movement**, making later stages more demanding than the earlier ones.
 
-- 10 Sokoban level layouts
-- 16×16 tile-based boards
-- WASD movement
-- Arrow-key movement
-- Box-pushing mechanics
-- Goal detection
-- Boxes-on-goals
-- Level reset
-- Main menu
-- Instructions screen
-- Level progression
-- Move counter
-- Goal counter
-- Level counter
-- Custom pixel-art graphics
-- Level-complete screen
-- Game-over screen
+SEIBISHI currently features:
 
-## Controls
+- 🧩 **10 playable levels**
+- 👾 **Moving enemies** that can collide with the player
+- ❤️ **Limited hearts** and collision penalties
+- ⭐ **Level scoring and score progression**
+- 📈 **Progressive difficulty** as the player advances
+- 🎵 **Background music and gameplay sound effects**
+- 💾 **Save/load game functionality**
+- 🏆 **Game-over and level-completion screens**
+- 🎨 **Space-themed visual design**
+- 📜 **Credits and external asset attribution**
+- 🔊 **Music and sound controls**
 
-| Key | Action |
-|---|---|
-| `W` / `A` / `S` / `D` | Move player |
-| Arrow Keys | Move player |
-| `R` | Reset current level |
-| `Enter` | Start / continue to next level |
-| `I` | Open instructions |
-| `M` | Return to main menu |
-| `Esc` | Quit from main menu |
+The objective is simple: **solve the puzzle, survive the enemies, and make it through all ten levels.**
 
-## Project Structure
+SEIBISHI is designed around a balance between careful planning and movement. A player may know the correct solution to a puzzle, but enemy movement and limited hearts can turn that solution into a much more demanding challenge.
 
-```text
-SEIBISHI/
-│
-├── seibishi.c
-├── README.md
-│
-└── texture/
-    ├── floor.png
-    ├── wall.png
-    ├── goal.png
-    ├── box.png
-    ├── box_goal.png
-    ├── player.png
-    ├── menubg.png
-    ├── instructions.png
-    ├── win.png
-    └── gameover.png
+### Technology
+
+- **Language:** C
+- **Game Library:** Raylib
+- **External Assets:** OpenGameArt.org
+- **Platform:** Desktop
+
+### Credits
+
+**Students**
+- [2505139]()
+- [2505124]
+
+**Advisor**
+- [Junaed Younus Khan Sir](https://www.junaedyounuskhan.com/)
+
+**Game Library**
+- Raylib
+
+**External Source**
+- OpenGameArt.org  
+  https://opengameart.org/
