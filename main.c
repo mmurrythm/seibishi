@@ -88,12 +88,18 @@ Rectangle instructionsExitButton = { 576, 452, 76, 72 };
 Rectangle confirmYesButton   = { 576, 268, 76, 78 };
 Rectangle confirmNoButton    = { 576, 360, 76, 78 };
 Rectangle confirmExitButton  = { 576, 452, 76, 72 };
+Rectangle creditsGithubButton = { 0 };
+Rectangle creditsAdvisorButton = { 0 };
+Rectangle creditsSourceButton = { 0 };
+Rectangle creditsBackButton = { 0 };
 bool musicOn = true;
 bool keysOn = true;
 bool actionsOn = true;
 float musicVolume = 0.7f;
 int difficulty = 1; // 0 = Easy // 1 = Normal // 2 = Hard
 float enemyMoveInterval = 0.3f;
+float masterVolume = 0.35f;
+
 Rectangle musicButton  = { 500, 190, 100, 45 };
 Rectangle keysButton   = { 500, 270, 100, 45 };
 Rectangle actionsButton = { 500, 350, 100, 45 };
@@ -111,6 +117,9 @@ int playerStartsX[10] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
 int playerStartsY[10] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
 void init_Board(int levelNum);
 float getEnemyInterval(int levelNum);
+void SaveSettings(void);
+void LoadSettings(void);
+void ApplySettings( Music menuMusic, Sound selectSound, Sound moveSound, Sound loadgameSound, Sound hitSound, Sound winSound, Sound gameOverSound, Sound goalSound);
 
 int mouseClicked(Rectangle button)
 {
@@ -890,28 +899,6 @@ void loadProfileName(char *name)
     fclose(file);
 }
 
-void updateDifficultySpeed(void)
-{
-    if (difficulty == 0)
-        enemyMoveInterval = 0.50f;      // EASY
-    else if (difficulty == 1)
-        enemyMoveInterval = 0.30f;      // NORMAL
-    else
-        enemyMoveInterval = 0.18f;      // HARD
-}
-
-void updateEnemySpeed(int levelNum)
-{
-    if (levelNum <= 3)
-        enemyMoveInterval = 0.50f;   // Levels 1-3: slow
-
-    else if (levelNum <= 6)
-        enemyMoveInterval = 0.35f;   // Levels 4-6: medium
-
-    else
-        enemyMoveInterval = 0.22f;   // Levels 7-10: fast
-}
-
 float getEnemyInterval(int levelNum)
 {
     float base;
@@ -932,23 +919,135 @@ float getEnemyInterval(int levelNum)
     return base - 0.05f;
 }
 
+void SaveSettings(void)
+{
+    FILE *file = fopen(SETTINGS_FILE, "w");
+
+    if (file == NULL)
+    {
+        printf("Failed to save settings.\n");
+        return;
+    }
+
+    fprintf(file, "%d\n", musicOn);
+    fprintf(file, "%d\n", keysOn);
+    fprintf(file, "%d\n", actionsOn);
+    fprintf(file, "%.2f\n", musicVolume);
+    fprintf(file, "%d\n", difficulty);
+
+    fclose(file);
+}
+
+void LoadSettings(void)
+{
+    FILE *file = fopen(SETTINGS_FILE, "r");
+
+    if (file == NULL)
+    {
+        return; // Use default settings
+    }
+
+    int loadedMusicOn;
+    int loadedKeysOn;
+    int loadedActionsOn;
+    float loadedMusicVolume;
+    int loadedDifficulty;
+
+    if (fscanf(file, "%d", &loadedMusicOn) != 1 ||
+            fscanf(file, "%d", &loadedKeysOn) != 1 ||
+            fscanf(file, "%d", &loadedActionsOn) != 1 ||
+            fscanf(file, "%f", &loadedMusicVolume) != 1 ||
+            fscanf(file, "%d", &loadedDifficulty) != 1)
+    {
+        printf("Invalid settings file. Using defaults.\n");
+        fclose(file);
+        return;
+    }
+
+    musicOn = loadedMusicOn;
+    keysOn = loadedKeysOn;
+    actionsOn = loadedActionsOn;
+
+    if (loadedMusicVolume < 0.0f)
+        loadedMusicVolume = 0.0f;
+
+    if (loadedMusicVolume > 1.0f)
+        loadedMusicVolume = 1.0f;
+
+    musicVolume = loadedMusicVolume;
+
+    if (loadedDifficulty < 0)
+        loadedDifficulty = 0;
+
+    if (loadedDifficulty > 2)
+        loadedDifficulty = 2;
+
+    difficulty = loadedDifficulty;
+
+    fclose(file);
+}
+
+void ApplySettings( Music menuMusic, Sound selectSound, Sound moveSound, Sound loadgameSound, Sound hitSound, Sound winSound, Sound gameOverSound, Sound goalSound)
+{
+    SetMusicVolume(
+        menuMusic,
+        musicOn ? musicVolume : 0.0f
+    );
+
+    SetSoundVolume(
+        selectSound,
+        keysOn ? masterVolume : 0.0f
+    );
+
+    SetSoundVolume(
+        moveSound,
+        keysOn ? masterVolume : 0.0f
+    );
+
+    SetSoundVolume(
+        hitSound,
+        actionsOn ? masterVolume : 0.0f
+    );
+
+    SetSoundVolume(
+        loadgameSound,
+        actionsOn ? masterVolume : 0.0f
+    );
+
+    SetSoundVolume(
+        winSound,
+        actionsOn ? masterVolume : 0.0f
+    );
+
+    SetSoundVolume(
+        gameOverSound,
+        actionsOn ? masterVolume : 0.0f
+    );
+
+    SetSoundVolume(
+        goalSound,
+        actionsOn ? masterVolume : 0.0f
+    );
+}
+
 int main(void)
 {
     const int screenwidth = 800, screenheight = 800;
     InitWindow(screenwidth, screenheight, "SEIBISHI");
     SetExitKey(KEY_NULL);
     InitAudioDevice();
+    LoadSettings();
     //audio/.wavfiles
     Music menuMusic = LoadMusicStream("assets/audio/introwavybgm.mp3");
     menuMusic.looping = true;
-    float masterVolume = 0.35f;
     Sound selectSound = LoadSound("assets/audio/select.wav");
     Sound moveSound = LoadSound("assets/audio/move.wav");
     Sound loadgameSound = LoadSound("assets/audio/loadgame.wav");
     Sound hitSound = LoadSound("assets/audio/hit.wav");
     Sound winSound = LoadSound("assets/audio/newlevel.wav");
     Sound gameOverSound = LoadSound("assets/audio/gameover.wav");
-    Sound goalSound = LoadSound("assets/audio/boxongoal.wav"); 
+    Sound goalSound = LoadSound("assets/audio/boxongoal.wav");
+    ApplySettings( menuMusic, selectSound,moveSound,loadgameSound,hitSound, winSound,gameOverSound,goalSound);
     SetTargetFPS(60);
     //texture/.pngfiles
     Texture2D floorTexture = LoadTexture("assets/texture/floor.png");
@@ -956,12 +1055,14 @@ int main(void)
     Texture2D goalTexture = LoadTexture("assets/texture/goal.png");
     Texture2D boxTexture = LoadTexture("assets/texture/box.png");
     Texture2D playerTexture = LoadTexture("assets/texture/player.png");
+    Texture2D enemyTexture = LoadTexture("assets/texture/enemy.png");
     Texture2D boxOnGoalTexture = LoadTexture("assets/texture/box_goal.png");
-    Texture2D winTexture = LoadTexture("assets/texture/win.png");
     Texture2D menubgTexture = LoadTexture("assets/texture/menubg.png");
     Texture2D instructionbgTexture = LoadTexture("assets/texture/instructions.png");
     Texture2D gameoverTexture = LoadTexture("assets/texture/gameover.png");
     Texture2D escapeConfirm = LoadTexture("assets/texture/escConf.png");
+    Texture2D gamewinTexture = LoadTexture("assets/texture/gamewin.png");
+    Texture2D heartTexture = LoadTexture("assets/texture/heart.png");
     Screen screen = SCREEN_MENU;
     Screen previousScreen = SCREEN_GAME;
     int exitRequested = 0;
@@ -1002,8 +1103,6 @@ int main(void)
     int profileEditing = 0;
 
     PlayMusicStream(menuMusic);
-    difficulty = 1;
-    updateDifficultySpeed();
     while (!WindowShouldClose() &&(exitRequested==0))
     {
         UpdateMusicStream(menuMusic);
@@ -1143,6 +1242,7 @@ int main(void)
                 if (loadGame(&player, &levelNum, enemies, &enemyCount))
                 {
                     totalcount = countGoals();
+                    enemyMoveInterval = getEnemyInterval(levelNum);
                     enemyTimer = 0.0f;
                     gamewon = 0;
                     scoreRecorded = 0;
@@ -1292,53 +1392,35 @@ int main(void)
             if (shown == 0) DrawText("NO SCORES YET", 285, 180, 25, GRAY);
             for (int i = 0; i < shown; i++)
             {
-                Color bar = i == 0 ? GOLD :
-                            i == 1 ? (Color)
+                Color bar = i == 0 ? GOLD : i == 1 ? (Color)
                 {
                     192,192,192,255
-} :
+                } :
                 i == 2 ? (Color)
                 {
                     205,127,50,255
-} :
+                } :
                 (Color)
                 {
                     25,35,80,255
                 };
-
                 Rectangle r = {150, 125 + i * 58, 500, 48};
-
                 DrawRectangleRec(r, bar);
                 DrawRectangleLinesEx(r, 2, RAYWHITE);
-
-                DrawText(TextFormat("#%d", i + 1),
-                         170, r.y + 12, 20, BLACK);
-
-                DrawText(e[i].name,
-                         245, r.y + 12, 20,
-                         i < 3 ? BLACK : RAYWHITE);
-
-                DrawText(TextFormat("%d", e[i].score),
-                         550, r.y + 12, 20,
-                         i < 3 ? BLACK : GOLD);
+                DrawText(TextFormat("#%d", i + 1), 170, r.y + 12, 20, BLACK);
+                DrawText(e[i].name, 245, r.y + 12, 20, i < 3 ? BLACK : RAYWHITE);
+                DrawText(TextFormat("%d", e[i].score), 550, r.y + 12, 20, i < 3 ? BLACK : GOLD);
             }
-
             DrawRectangleRec(backButton, Fade(BLACK, 0.4f));
-
-            if (CheckCollisionPointRec(GetMousePosition(), backButton))
-                DrawRectangleRec(backButton, Fade(WHITE, 0.15f));
-
+            if (CheckCollisionPointRec(GetMousePosition(), backButton)) DrawRectangleRec(backButton, Fade(WHITE, 0.15f));
             DrawRectangleLinesEx(backButton, 2, RAYWHITE);
             DrawText("BACK", 360, 620, 25, RAYWHITE);
-
             EndDrawing();
-
             if (mouseClicked(backButton))
             {
                 PlaySound(selectSound);
                 screen = previousScreen;
             }
-
             continue;
         }
         if (screen == SCREEN_INSTRUCTIONS)
@@ -1367,9 +1449,7 @@ int main(void)
             {
                 5, 10, 55, 255
             });
-
             DrawText("SETTINGS", 300, 70, 40, RAYWHITE);
-
             // MUSIC
             DrawText("MUSIC", 150, 185, 22, RAYWHITE);
             DrawText("Background Music", 150, 215, 18, LIGHTGRAY);
@@ -1442,30 +1522,26 @@ int main(void)
             if (mouseClicked(musicButton))
             {
                 musicOn = !musicOn;
-                SetMusicVolume(menuMusic, musicOn ? musicVolume : 0.0f);
+                ApplySettings( menuMusic, selectSound,moveSound,loadgameSound,hitSound, winSound,gameOverSound,goalSound);
                 PlaySound(selectSound);
+                SaveSettings();
             }
 
             // MUSIC VOLUME SLIDER
-            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) ||
-                    IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) || IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 Vector2 m = GetMousePosition();
 
-                if (CheckCollisionPointRec(
-                            m,
-                            (Rectangle)
+                if (CheckCollisionPointRec( m, (Rectangle)
             {
                 290, 230, 300, 35
             }))
                 {
                     musicVolume = (m.x - 300) / 280.0f;
-
                     if (musicVolume < 0.0f) musicVolume = 0.0f;
                     if (musicVolume > 1.0f) musicVolume = 1.0f;
-
-                    if (musicOn)
-                        SetMusicVolume(menuMusic, musicVolume);
+                    if (musicOn) SetMusicVolume(menuMusic, musicVolume);
+                    SaveSettings();
                 }
             }
 
@@ -1473,10 +1549,8 @@ int main(void)
             if (mouseClicked(keysButton))
             {
                 keysOn = !keysOn;
-
-                SetSoundVolume(selectSound, keysOn ? masterVolume : 0.0f);
-                SetSoundVolume(moveSound, keysOn ? masterVolume : 0.0f);
-
+                ApplySettings( menuMusic, selectSound,moveSound,loadgameSound,hitSound, winSound,gameOverSound,goalSound);
+                SaveSettings();
                 PlaySound(selectSound);
             }
 
@@ -1484,12 +1558,8 @@ int main(void)
             if (mouseClicked(actionsButton))
             {
                 actionsOn = !actionsOn;
-
-                SetSoundVolume(hitSound, actionsOn ? masterVolume : 0.0f);
-                SetSoundVolume(loadgameSound, actionsOn ? masterVolume : 0.0f);
-                SetSoundVolume(winSound, actionsOn ? masterVolume : 0.0f);
-                SetSoundVolume(gameOverSound, actionsOn ? masterVolume : 0.0f);
-                SetSoundVolume(goalSound, actionsOn ? masterVolume : 0.0f);
+                ApplySettings( menuMusic, selectSound,moveSound,loadgameSound,hitSound, winSound,gameOverSound,goalSound);
+                SaveSettings();
             }
 
             // BACK
@@ -1501,22 +1571,25 @@ int main(void)
             if (mouseClicked(easyButton))
             {
                 difficulty = 0;
-                updateDifficultySpeed();
+                enemyMoveInterval = getEnemyInterval(levelNum);
                 PlaySound(selectSound);
+                SaveSettings();
             }
 
             if (mouseClicked(normalButton))
             {
                 difficulty = 1;
-                updateDifficultySpeed();
+                enemyMoveInterval = getEnemyInterval(levelNum);
                 PlaySound(selectSound);
+                SaveSettings();
             }
 
             if (mouseClicked(hardButton))
             {
                 difficulty = 2;
-                updateDifficultySpeed();
+                enemyMoveInterval = getEnemyInterval(levelNum);
                 PlaySound(selectSound);
+                SaveSettings();
             }
 
             continue;
@@ -1524,43 +1597,103 @@ int main(void)
         if (screen == SCREEN_CREDITS)
         {
             BeginDrawing();
-            ClearBackground((Color)
+            ClearBackground(BLACK);
+
+            const int cx = 384;
+            const Color accent = {255, 180, 205, 255};
+            const Color link = {120, 190, 255, 255};
+            const Color muted = {170, 170, 180, 255};
+
+            Rectangle panel = {80, 35, 608, 575};
+            DrawRectangleRounded(panel, 0.035f, 12, Fade((Color)
             {
-                5, 10, 55, 255
-            });
-
-            DrawText("CREDITS", 315, 70, 40, RAYWHITE);
-            DrawText("SEIBISHI", 325, 125, 28, (Color)
+                18,18,28,255
+            }, 0.96f));
+            DrawRectangleRoundedLines(panel, 0.035f, 12, Fade(accent, 0.45f));
+            DrawText("CREDITS", cx - MeasureText("CREDITS", 40) / 2, 58, 40, RAYWHITE);
+            DrawLine(145, 112, 623, 112, Fade(accent, 0.45f));
+            DrawText("SEIBISHI", cx - MeasureText("SEIBISHI", 30) / 2, 132, 30, accent);
+            DrawText("STUDENTS", cx - MeasureText("STUDENTS", 20) / 2, 185, 20, RAYWHITE);
+            const char *student1 = "2505139";
+            const char *student2 = "2505124";
+            Rectangle github1 =
             {
-                255, 180, 205, 255
-            });
-
-            DrawText("STUDENTS", 320, 190, 20, RAYWHITE);
-            DrawText("2505139  |  github.com/mmurrythm", 235, 225, 18, LIGHTGRAY);
-            DrawText("2505124", 350, 252, 18, LIGHTGRAY);
-
-            DrawText("ADVISOR", 325, 305, 20, RAYWHITE);
-            DrawText("JYK", 375, 340, 18, LIGHTGRAY);
-            DrawText("junaedyounuskhan.com", 285, 368, 18, LIGHTGRAY);
-
-            DrawText("GAME LIBRARY", 295, 420, 20, RAYWHITE);
-            DrawText("Raylib", 365, 455, 18, LIGHTGRAY);
-
-            DrawText("EXTERNAL SOURCE", 270, 505, 20, RAYWHITE);
-            DrawText("OpenGameArt.org", 325, 540, 18, LIGHTGRAY);
-            DrawText("opengameart.org", 325, 567, 18, LIGHTGRAY);
-
-            // Back button
-            DrawRectangleRec(backButton, (Color)
+                cx -30, 220,
+                MeasureText(student1, 18), 22
+            };
+            Rectangle github2 =
             {
-                10, 10, 20, 230
-            });
-            DrawRectangleLinesEx(backButton, 2, RAYWHITE);
-            DrawText("BACK", 365, 616, 22, RAYWHITE);
+                cx -30, 250,
+                MeasureText(student2, 18), 22
+            };
+            DrawText(student1, github1.x, github1.y, 18, link);
+            DrawText(student2, github2.x, github2.y, 18, link);
+            DrawText("ADVISOR", cx - MeasureText("ADVISOR", 20) / 2, 290, 20, RAYWHITE);
+            DrawText("JYK", cx - MeasureText("JYK", 18) / 2, 325, 18, muted);
+             Rectangle advisor =
+            {
+                cx - 130, 355, 260, 25
+            };
+            DrawText("junaedyounuskhan.com", cx - MeasureText("junaedyounuskhan.com", 17) / 2, 355, 17, link);
+            DrawText("GAME LIBRARY", cx - MeasureText("GAME LIBRARY", 20) / 2, 405, 20, RAYWHITE);
+            Rectangle raylib =
+            {
+                cx - MeasureText("raylib.com", 17) / 2,
+                440,
+                MeasureText("raylib.com", 17),
+                22
+            };
+            DrawText("raylib.com", raylib.x, raylib.y, 17, link);
+            DrawText("EXTERNAL SOURCE", cx - MeasureText("EXTERNAL SOURCE", 20) / 2, 485, 20, RAYWHITE);
+            Rectangle source =
+            {
+                cx - MeasureText("opengameart.org", 18) / 2, 520, MeasureText("opengameart.org", 18), 22
+            };
+            DrawText("opengameart.org", source.x, source.y, 18, link);
+            Rectangle back = {290, 565, 188, 34};
+            DrawRectangleRounded(back, 0.25f, 8, Fade(BLACK, 0.65f));
+            DrawRectangleRoundedLines(back, 0.25f, 8, Fade(RAYWHITE, 0.35f));
+            DrawText("ESC / M  :  BACK", back.x + (back.width - MeasureText("ESC / M  :  BACK", 16)) / 2, back.y + 8, 16, RAYWHITE);
+            Vector2 mouse = GetMousePosition();
+
+            Rectangle links[] = {github1, github2, advisor, raylib, source};
+
+            for (int i = 0; i < 5; i++)
+            {
+                if (CheckCollisionPointRec(mouse, links[i]))
+                    DrawRectangleRounded(
+                        links[i], 0.2f, 6, Fade(link, 0.10f)
+                    );
+            }
+
+            if (CheckCollisionPointRec(mouse, back))
+                DrawRectangleRounded(
+                    back, 0.25f, 8, Fade(WHITE, 0.10f)
+                );
 
             EndDrawing();
 
-            if (mouseClicked(backButton))
+            /* -------------------------------------------------
+               HYPERLINK ACTIONS
+               ------------------------------------------------- */
+            if (mouseClicked(github1))
+                OpenURL("https://github.com/mmurrythm");
+
+            if (mouseClicked(github2))
+                OpenURL("https://github.com/mahimhasan9130-beep");
+
+            if (mouseClicked(advisor))
+                OpenURL("https://www.junaedyounuskhan.com/");
+
+            if (mouseClicked(raylib))
+                OpenURL("https://www.raylib.com/");
+
+            if (mouseClicked(source))
+                OpenURL("https://opengameart.org/");
+
+            if (IsKeyPressed(KEY_ESCAPE) ||
+                    IsKeyPressed(KEY_M) ||
+                    mouseClicked(back))
             {
                 PlaySound(selectSound);
                 screen = previousScreen;
@@ -1569,15 +1702,8 @@ int main(void)
             continue;
         }
 
-        int debug_screen_game_counter = 0;
         if (screen == SCREEN_GAME)
         {
-            if(debug_screen_game_counter == 0)
-            {
-                TraceLog(LOG_INFO, "DEBUG: entered gameplay section");
-                debug_screen_game_counter++;
-            }
-            TraceLog(LOG_INFO, "DEBUG: before updateGame");
             if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_M))
             {
                 PlaySound(selectSound);
@@ -1588,7 +1714,6 @@ int main(void)
             if (IsKeyPressed(KEY_R))
             {
                 PlaySound(selectSound);
-
                 int savedHearts    = player.hearts;
                 int baseScore  = player.score - player.levelScore;   // strip current level earnings
                 int savedScore = (baseScore * 85) / 100;   // penalise level score
@@ -1657,14 +1782,11 @@ int main(void)
                         player.y = nextY;
                         player.moves++;
                         applyMoveScore(&player, 0);
-
                         PlaySound(moveSound);
                     }
                 }
-
             }
             int playerHit = 0;
-
             if (gamewon == 0 && checkEnemyCollision(player, enemies, enemyCount))
             {
                 handleEnemyHit(levelNum, &player, enemies, &enemyCount, &totalcount, &gamewon, &enemyTimer, hitSound);
@@ -1673,15 +1795,11 @@ int main(void)
             if (gamewon == 2)
             {
                 recordScoreOnce(&player, &scoreRecorded);
+                PlaySound(gameOverSound);
                 screen = SCREEN_GAMEOVER;
                 continue;
             }
-            // -----------------------------------------------------
-            // ENEMY MOVEMENT
-            // -----------------------------------------------------
-
             enemyTimer += GetFrameTime();
-
             if (enemyTimer >= enemyMoveInterval && gamewon == 0)
             {
                 updateEnemies(enemies, enemyCount,&player,levelNum);
@@ -1693,6 +1811,7 @@ int main(void)
                 if (gamewon == 2)
                 {
                     recordScoreOnce(&player, &scoreRecorded);
+                    PlaySound(gameOverSound);
                     screen = SCREEN_GAMEOVER;
                     continue;
                 }
@@ -1703,10 +1822,7 @@ int main(void)
             {
                 for (int x = 0; x < BOARD_SIZE; x++)
                 {
-                    if (goals[y][x] == '.' && board[y][x] == '$')
-                    {
-                        goalCount++;
-                    }
+                    if (goals[y][x] == '.' && board[y][x] == '$') goalCount++;
                 }
             }
             if (gamewon == 0 && goalCount == totalcount)
@@ -1733,13 +1849,13 @@ int main(void)
                     enemyMoveInterval = getEnemyInterval(levelNum);
                     player.levelScore = 0;
                     totalcount = countGoals();
-                    updateEnemySpeed(levelNum);
                     enemyTimer = 0.0f;
                     gamewon = 0;
                 }
             }
             if (gamewon == 2)
             {
+                PlaySound(gameOverSound);
                 screen = SCREEN_GAMEOVER;
                 continue;
             }
@@ -1794,7 +1910,7 @@ int main(void)
             {
                 if (enemies[i].active)
                 {
-                    DrawRectangle( boardoffsetX + enemies[i].x * 32, boardoffsetY + enemies[i].y * 32, 32, 32, RED );
+                    DrawTexture(enemyTexture, boardoffsetX + enemies->x * 32, boardoffsetY + enemies->y* 32, WHITE );
                 }
             }
             DrawTexture( playerTexture, boardoffsetX + player.x * 32, boardoffsetY + player.y * 32, WHITE );
@@ -1835,31 +1951,42 @@ int main(void)
             };
             DrawRectangleRec(heartBox, hudBG);
             DrawRectangleLinesEx(heartBox, 2, hudBorder);
-            DrawText("HEALTH",heartBox.x + 12,heartBox.y + 7,16, GRAY);
+            DrawText("HEALTH", heartBox.x + 12, heartBox.y + 7, 16, GRAY);
             for (int i = 0; i < 3; i++)
             {
                 Rectangle heartBar =
                 {
                     heartBox.x + 12 + i * 52,
-                    heartBox.y + 29,
+                    heartBox.y + 25,
                     42,
-                    14
+                    24
                 };
-                if (i < player.hearts)
+                Color heartColor;
+                if (i < player.hearts) heartColor = WHITE;
+                else heartColor = Fade(DARKGRAY, 0.5f);
+                Rectangle source =
                 {
-                    DrawRectangleRec(heartBar,RED);
-                }
-                else
+                    0,
+                    0,
+                    (float)heartTexture.width,
+                    (float)heartTexture.height
+                };
+                DrawTexturePro(
+                    heartTexture,
+                    source,
+                    heartBar,
+                    (Vector2)
                 {
-                    DrawRectangleRec( heartBar,Fade(DARKGRAY, 0.5f));
-                }
-                DrawRectangleLinesEx( heartBar, 1, RAYWHITE );
+                    0, 0
+                },
+                0.0f,
+                heartColor
+                );
             }
             EndDrawing();
         }
         if (screen == SCREEN_GAMEOVER)
         {
-            
             BeginDrawing();
             ClearBackground(BLACK);
             DrawTexture(gameoverTexture, 0, 0, WHITE);
@@ -1880,17 +2007,60 @@ int main(void)
                 menuButton.height - 10
             };
             if (mouseOver) DrawRectangleRec(innerButton, DARKGRAY);
-            else {DrawRectangleRec(innerButton, BLACK);}
+            else
+            {
+                DrawRectangleRec(innerButton, BLACK);
+            }
             DrawRectangleLinesEx(menuButton, 2, LIGHTGRAY);
             const char *menuText = "BACK TO MENU";
             int textWidth = MeasureText(menuText, 20);
             DrawText( menuText, (int)(menuButton.x + (menuButton.width - textWidth) / 2), (int)(menuButton.y + 17), 20, mouseOver ? LIME : GREEN);
             EndDrawing();
             if (mouseOver && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || IsKeyPressed(KEY_ENTER))
-            { screen = SCREEN_MENU; PlaySound(selectSound); }
+            {
+                screen = SCREEN_MENU;
+                PlaySound(selectSound);
+            }
+            continue;
+        }
+        if(screen == SCREEN_WIN)
+        {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            DrawTexture(gamewinTexture,0,0,WHITE);
+            Rectangle menuButton =
+            {
+                260, 720, 280, 55
+            };
+            Vector2 mouse = GetMousePosition();
+            bool mouseOver = CheckCollisionPointRec(mouse, menuButton);
+            DrawRectangleRec(menuButton, GRAY);
+            Rectangle innerButton =
+            {
+                menuButton.x + 5,
+                menuButton.y + 5,
+                menuButton.width - 10,
+                menuButton.height - 10
+            };
+            if (mouseOver) DrawRectangleRec(innerButton, DARKGRAY);
+            else
+            {
+                DrawRectangleRec(innerButton, BLACK);
+            }
+            DrawRectangleLinesEx(menuButton, 2, LIGHTGRAY);
+            const char *menuText = "BACK TO MENU";
+            int textWidth = MeasureText(menuText, 20);
+            DrawText( menuText, (int)(menuButton.x + (menuButton.width - textWidth) / 2), (int)(menuButton.y + 17), 20, mouseOver ? LIME : GREEN);
+            EndDrawing();
+            if ((mouseOver && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) || IsKeyPressed(KEY_ENTER))
+            {
+                screen = SCREEN_MENU;
+                PlaySound(selectSound);
+            }
             continue;
         }
     }
+    SaveSettings();
     UnloadMusicStream(menuMusic);
     UnloadSound(moveSound);
     UnloadSound(hitSound);
@@ -1904,12 +2074,14 @@ int main(void)
     UnloadTexture(goalTexture);
     UnloadTexture(boxTexture);
     UnloadTexture(playerTexture);
+    UnloadTexture(enemyTexture);
     UnloadTexture(boxOnGoalTexture);
-    UnloadTexture(winTexture);
     UnloadTexture(menubgTexture);
     UnloadTexture(instructionbgTexture);
     UnloadTexture(gameoverTexture);
+    UnloadTexture(gamewinTexture);
     UnloadTexture(escapeConfirm);
+    UnloadTexture(heartTexture);
     CloseAudioDevice();
     CloseWindow();
     return 0;
