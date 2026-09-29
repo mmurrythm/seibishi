@@ -19,6 +19,7 @@
 const char tileTypes[TILE_TYPES] = {' ', '#', '.', '$'}; // Empty, Wall, Goal, Box
 char board[BOARD_SIZE][BOARD_SIZE];
 char goals[BOARD_SIZE][BOARD_SIZE];
+char originalProfileName[MAX_NAME_LENGTH];
 
 typedef struct
 {
@@ -99,6 +100,7 @@ float musicVolume = 0.7f;
 int difficulty = 1; // 0 = Easy // 1 = Normal // 2 = Hard
 float enemyMoveInterval = 0.3f;
 float masterVolume = 0.35f;
+bool profileChanged = false;
 
 Rectangle musicButton  = { 500, 190, 100, 45 };
 Rectangle keysButton   = { 500, 270, 100, 45 };
@@ -120,6 +122,7 @@ float getEnemyInterval(int levelNum);
 void SaveSettings(void);
 void LoadSettings(void);
 void ApplySettings( Music menuMusic, Sound selectSound, Sound moveSound, Sound loadgameSound, Sound hitSound, Sound winSound, Sound gameOverSound, Sound goalSound);
+void changeProfileName(Player *player, const char *newName, int *levelNum, Enemy enemies[], int *enemyCount, int *totalcount, float *enemyTimer, int *gamewon);
 
 int mouseClicked(Rectangle button)
 {
@@ -362,22 +365,12 @@ int saveGame(Player *player, int levelNum, Enemy enemies[], int enemyCount)
     }
 
     SaveData data;
-
     data.levelNum = levelNum;
     data.player = *player;
-
     memcpy(data.board, board, sizeof(board));
-
     data.enemyCount = enemyCount;
-
-    memcpy(data.enemies,
-           enemies,
-           sizeof(Enemy) * enemyCount);
-
-    size_t written = fwrite(&data,
-                            sizeof(SaveData),
-                            1,
-                            file);
+    memcpy(data.enemies,  enemies, sizeof(Enemy) * enemyCount);
+    size_t written = fwrite(&data,  sizeof(SaveData), 1, file);
 
     fclose(file);
 
@@ -794,8 +787,6 @@ void addEnemy(Enemy enemies[], int *enemyCount, int index, int routeX[], int rou
 
 void startNewGame(int *levelNum, Player *player, Enemy enemies[], int *enemyCount, int *totalcount, float *enemyTimer, int *gamewon)
 {
-    char savedName[MAX_NAME_LENGTH];
-    strcpy(savedName, player->name);
     *levelNum = 1;
     player->x = playerStartsX[0];
     player->y = playerStartsY[0];
@@ -803,7 +794,7 @@ void startNewGame(int *levelNum, Player *player, Enemy enemies[], int *enemyCoun
     player->moves = 0;
     player->score = 0;
     player->levelScore = 0;
-    strcpy(player->name, savedName);
+    // player->name is intentionally left untouched
     resetLevel(*levelNum, player, enemies, enemyCount);
     enemyMoveInterval = getEnemyInterval(*levelNum);
     *totalcount = countGoals();
@@ -897,6 +888,16 @@ void loadProfileName(char *name)
     }
     if (fscanf(file, "%31s", name) != 1) strcpy(name, "PLAYER");
     fclose(file);
+}
+
+void changeProfileName(Player *player, const char *newName, int *levelNum, Enemy enemies[], int *enemyCount, int *totalcount, float *enemyTimer, int *gamewon)
+{
+    // Same name = same game
+    if (strcmp(player->name, newName) == 0) {return;}
+    else{
+    strcpy(player->name, newName); 
+    startNewGame( levelNum, player, enemies, enemyCount, totalcount, enemyTimer, gamewon );
+    }
 }
 
 float getEnemyInterval(int levelNum)
@@ -1072,13 +1073,13 @@ int main(void)
     init_Board(levelNum);
 
     Player player;
+    // strcpy(player.name, "PLAYER");
     loadProfileName(player.name);
     player.x = playerStartsX[levelNum - 1];
     player.y = playerStartsY[levelNum - 1];
     player.hearts = 3;
     player.moves = 0;
     player.score = 0;
-    strcpy(player.name, "PLAYER");
 
     Enemy enemies[MAX_ENEMIES];
     int enemyCount = 0;
@@ -1146,8 +1147,6 @@ int main(void)
                 PlaySound(selectSound);
                 screen = previousScreen;
             }
-
-
             continue;
         }
         if (screen == SCREEN_SAVE)
@@ -1239,7 +1238,7 @@ int main(void)
             if (IsKeyPressed(KEY_ENTER) || mouseClicked(menuPlayButton))
             {
                 PlaySound(selectSound);
-                if (loadGame(&player, &levelNum, enemies, &enemyCount))
+                if ((!profileChanged) && loadGame(&player, &levelNum, enemies, &enemyCount))
                 {
                     totalcount = countGoals();
                     enemyMoveInterval = getEnemyInterval(levelNum);
@@ -1251,10 +1250,14 @@ int main(void)
                 }
                 else
                 {
-                    TraceLog(LOG_WARNING, "No valid save found.");
                     startNewGame(&levelNum, &player, enemies, &enemyCount, &totalcount, &enemyTimer, &gamewon);
                     screen = SCREEN_GAME;
                 }
+                enemyMoveInterval = getEnemyInterval(levelNum);
+                enemyTimer = 0.0f;
+                gamewon = 0;
+                scoreRecorded = 0;
+                screen = SCREEN_GAME;
             }
             if (IsKeyPressed(KEY_BACKSLASH) || mouseClicked(menuRuleButton))
             {
@@ -1287,6 +1290,7 @@ int main(void)
             {
                 PlaySound(selectSound);
                 previousScreen = SCREEN_MENU;
+                strcpy(originalProfileName, player.name);
                 screen = SCREEN_PROFILE;
             }
             if (mouseClicked(menuLeaderboardButton))
@@ -1355,13 +1359,14 @@ int main(void)
             if (IsKeyPressed(KEY_BACKSPACE))
             {
                 int len = strlen(player.name);
-                if (len > 0)
-                    player.name[len - 1] = '\0';
+                if (len > 0) player.name[len - 1] = '\0';
             }
 
             // SAVE
             if (mouseClicked(saveButton))
             {
+                profileChanged = strcmp(originalProfileName, player.name) != 0;
+                if (profileChanged){startNewGame(&levelNum, &player, enemies, &enemyCount, &totalcount, &enemyTimer, &gamewon);}
                 saveProfileName(player.name);
                 PlaySound(selectSound);
                 screen = previousScreen;
