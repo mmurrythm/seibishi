@@ -71,7 +71,7 @@ Players must:
 Enemy behavior changes throughout the game. Earlier levels use simpler
 movement, while later levels introduce more persistent pursuit and
 predictive movement.
-
+![SEIBISHI Gameplay](screenshots/gameplay.png)
 ---
 
 ## 📈 Difficulty
@@ -151,6 +151,11 @@ Game state includes information such as:
 - Enemy count
 
 Saved game data is stored locally in:
+
+---
+
+### Credits
+![SEIBISHI Credits](screenshots/credits.png)
 
 ```text
 assets/logfiles/save.txt
