@@ -71,6 +71,8 @@ Players must:
 Enemy behavior changes throughout the game. Earlier levels use simpler
 movement, while later levels introduce more persistent pursuit and
 predictive movement.
+
+
 ![SEIBISHI Gameplay](screenshots/gameplay.png)
 ---
 
