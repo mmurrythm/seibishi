@@ -1,49 +1,156 @@
 # SEIBISHI
 
-## Introduction
+<p align="center">
+  <strong>A 16×16 tile-based puzzle game with enemies, progressive difficulty, scoring, and persistent game data.</strong>
+</p>
 
-**SEIBISHI** is a space-themed Sokoban-inspired puzzle game built with **Raylib** and C.
+<p align="center">
+  Built in C with raylib.
+</p>
 
-The player must navigate through a series of increasingly challenging levels, push objects onto their designated goals, avoid moving enemies, and manage their limited hearts while trying to achieve the highest possible score.
+---
 
-The game combines classic grid-based puzzle mechanics with an enemy system that introduces an additional layer of pressure. As the player progresses through the levels, the difficulty increases through both **level-based progression** and **progressive enemy movement**, making later stages more demanding than the earlier ones.
+## 🎮 About
 
-SEIBISHI currently features:
+**SEIBISHI** is a tile-based puzzle game developed in C using the
+[raylib](https://www.raylib.com/) library.
 
-- 🧩 **10 playable levels**
-- 👾 **Moving enemies** that can collide with the player
-- ❤️ **Limited hearts** and collision penalties
-- ⭐ **Level scoring and score progression**
-- 📈 **Progressive difficulty** as the player advances
-- 🎵 **Background music and gameplay sound effects**
-- 💾 **Save/load game functionality**
-- 🏆 **Game-over and level-completion screens**
-- 🎨 **Space-themed visual design**
-- 📜 **Credits and external asset attribution**
-- 🔊 **Music and sound controls**
+The game combines puzzle solving with enemy avoidance. Players navigate
+through progressively more difficult levels, interact with boxes and goals,
+manage their health, and avoid enemies whose behavior becomes increasingly
+challenging as the game progresses.
 
-The objective is simple: **solve the puzzle, survive the enemies, and make it through all ten levels.**
+The game contains **10 levels** with three difficulty modes:
 
-SEIBISHI is designed around a balance between careful planning and movement. A player may know the correct solution to a puzzle, but enemy movement and limited hearts can turn that solution into a much more demanding challenge.
+- Easy
+- Normal
+- Hard
 
-### Technology
+---
 
-- **Language:** C
-- **Game Library:** Raylib
-- **External Assets:** OpenGameArt.org
-- **Platform:** Desktop
+## ✨ Features
 
-### Credits
+- 10 handcrafted levels
+- 16×16 tile-based game board
+- Three difficulty modes
+- Progressive enemy difficulty
+- Enemy line-of-sight detection
+- Enemy pursuit behavior
+- Predictive enemy movement in later levels
+- Player health system
+- Score system
+- Level-based scoring
+- Level progression
+- Save and load system
+- Persistent player profile
+- Persistent settings
+- Music mute/unmute
+- Adjustable music volume
+- Leaderboard persistence
+- Instructions screen
+- Credits screen
+- Functional external hyperlinks
+- Game Over and Victory screens
 
-**Students**
-- [2505139](https://github.com/mmurrythm)
-- [2505124](https://github.com/mahimhasan9130-beep)
+---
 
-**Advisor**
-- [Junaed Younus Khan Sir](https://www.junaedyounuskhan.com/)
+## 🕹️ Gameplay
 
-**Game Library**
-- [Raylib](https://www.raylib.com/)
+The objective is to complete the level by solving the puzzle while avoiding
+enemies.
 
-**External Source**
-- [OpenGameArt.org](https://opengameart.org/)
+Players must:
+
+1. Navigate through the level.
+2. Interact with boxes and goals.
+3. Reach the required goals.
+4. Avoid enemy collisions.
+5. Manage their health.
+6. Progress through increasingly difficult levels.
+
+Enemy behavior changes throughout the game. Earlier levels use simpler
+movement, while later levels introduce more persistent pursuit and
+predictive movement.
+
+---
+
+## 📈 Difficulty
+
+### Easy
+
+Designed for a more forgiving experience with simpler enemy behavior.
+
+### Normal
+
+Provides the standard gameplay experience with stronger enemy pursuit.
+
+### Hard
+
+Introduces more aggressive enemy behavior and predictive movement,
+requiring more careful positioning and planning.
+
+---
+
+## 🧠 Enemy System
+
+SEIBISHI uses lightweight grid-based enemy behavior rather than complex
+pathfinding algorithms.
+
+Enemy behavior includes:
+
+- Random movement
+- Line-of-sight player detection
+- Direct pursuit
+- Direction-based player prediction
+- Different behavior depending on the current level
+
+Enemy count also increases as the game progresses.
+
+This keeps the enemy system appropriate for the game's 16×16 grid while
+allowing difficulty to scale across the 10 levels.
+
+---
+
+## 🏆 Scoring
+
+The game uses a score system based on player actions and successful goal
+completion.
+
+- Goal completion awards points.
+- Movement can affect the score.
+- Enemy collisions can result in a score penalty.
+- Level score is tracked separately from the overall score.
+
+Completed games can be recorded in the leaderboard.
+
+---
+
+## ❤️ Health
+
+The player starts with three hearts.
+
+Colliding with an enemy reduces health.
+
+If the player's health reaches zero, the game ends.
+
+When the player survives a collision, the current level is reset while
+appropriate progress and penalties are preserved.
+
+---
+
+## 💾 Save & Load
+
+SEIBISHI supports interrupted-game saving.
+
+Game state includes information such as:
+
+- Current level
+- Player state
+- Board state
+- Enemy state
+- Enemy count
+
+Saved game data is stored locally in:
+
+```text
+assets/logfiles/save.txt
