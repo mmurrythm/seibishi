@@ -37,7 +37,7 @@ SEIBISHI is designed around a balance between careful planning and movement. A p
 
 **Students**
 - [2505139](https://github.com/mmurrythm)
-- [2505124]
+- [2505124](https://github.com/mahimhasan9130-beep)
 
 **Advisor**
 - [Junaed Younus Khan Sir](https://www.junaedyounuskhan.com/)
