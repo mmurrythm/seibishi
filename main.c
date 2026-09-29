@@ -113,8 +113,8 @@ int scanForPlayer(Enemy *enemy, Player *player, int *moveX, int *moveY);
 void moveEnemyRandomly(Enemy *enemy);
 void updateEnemies(Enemy enemies[], int enemyCount, Player *player, int levelnum);
 void initEnemies(int levelNum, Enemy enemies[], int *enemyCount);
-int playerStartsX[10] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
-int playerStartsY[10] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+int playerStartsX[10] = {6, 2, 2, 1, 13, 2, 10, 2, 1, 5};
+int playerStartsY[10] = {2, 3, 2, 11, 2, 4, 3, 12, 2, 5};
 void init_Board(int levelNum);
 float getEnemyInterval(int levelNum);
 void SaveSettings(void);
@@ -1395,11 +1395,11 @@ int main(void)
                 Color bar = i == 0 ? GOLD : i == 1 ? (Color)
                 {
                     192,192,192,255
-                } :
+} :
                 i == 2 ? (Color)
                 {
                     205,127,50,255
-                } :
+} :
                 (Color)
                 {
                     25,35,80,255
@@ -1560,6 +1560,7 @@ int main(void)
                 actionsOn = !actionsOn;
                 ApplySettings( menuMusic, selectSound,moveSound,loadgameSound,hitSound, winSound,gameOverSound,goalSound);
                 SaveSettings();
+                PlaySound(selectSound);
             }
 
             // BACK
@@ -1600,82 +1601,197 @@ int main(void)
             ClearBackground(BLACK);
 
             const int cx = 384;
-            const Color accent = {255, 180, 205, 255};
-            const Color link = {120, 190, 255, 255};
-            const Color muted = {170, 170, 180, 255};
+            const Color accent = (Color)
+            {
+                255, 180, 205, 255
+            };
+            const Color link = (Color)
+            {
+                120, 190, 255, 255
+            };
+            const Color muted = (Color)
+            {
+                170, 170, 180, 255
+            };
 
             Rectangle panel = {80, 35, 608, 575};
-            DrawRectangleRounded(panel, 0.035f, 12, Fade((Color)
+
+            DrawRectangleRounded(
+                panel, 0.035f, 12,
+                Fade((Color)
             {
-                18,18,28,255
-            }, 0.96f));
-            DrawRectangleRoundedLines(panel, 0.035f, 12, Fade(accent, 0.45f));
-            DrawText("CREDITS", cx - MeasureText("CREDITS", 40) / 2, 58, 40, RAYWHITE);
+                18, 18, 28, 255
+            }, 0.96f)
+            );
+            DrawRectangleRoundedLines(
+                panel, 0.035f, 12,
+                Fade(accent, 0.45f)
+            );
+
+            DrawText(
+                "CREDITS",
+                cx - MeasureText("CREDITS", 40) / 2,
+                58, 40, RAYWHITE
+            );
+
             DrawLine(145, 112, 623, 112, Fade(accent, 0.45f));
-            DrawText("SEIBISHI", cx - MeasureText("SEIBISHI", 30) / 2, 132, 30, accent);
-            DrawText("STUDENTS", cx - MeasureText("STUDENTS", 20) / 2, 185, 20, RAYWHITE);
+
+            DrawText(
+                "SEIBISHI",
+                cx - MeasureText("SEIBISHI", 30) / 2,
+                132, 30, accent
+            );
+
+            DrawText(
+                "STUDENTS",
+                cx - MeasureText("STUDENTS", 20) / 2,
+                185, 20, RAYWHITE
+            );
+
             const char *student1 = "2505139";
             const char *student2 = "2505124";
+            const char *advisorText = "junaedyounuskhan.com";
+            const char *raylibText = "raylib.com";
+            const char *sourceText = "opengameart.org";
+
             Rectangle github1 =
             {
-                cx -30, 220,
-                MeasureText(student1, 18), 22
-            };
-            Rectangle github2 =
-            {
-                cx -30, 250,
-                MeasureText(student2, 18), 22
-            };
-            DrawText(student1, github1.x, github1.y, 18, link);
-            DrawText(student2, github2.x, github2.y, 18, link);
-            DrawText("ADVISOR", cx - MeasureText("ADVISOR", 20) / 2, 290, 20, RAYWHITE);
-            DrawText("JYK", cx - MeasureText("JYK", 18) / 2, 325, 18, muted);
-             Rectangle advisor =
-            {
-                cx - 130, 355, 260, 25
-            };
-            DrawText("junaedyounuskhan.com", cx - MeasureText("junaedyounuskhan.com", 17) / 2, 355, 17, link);
-            DrawText("GAME LIBRARY", cx - MeasureText("GAME LIBRARY", 20) / 2, 405, 20, RAYWHITE);
-            Rectangle raylib =
-            {
-                cx - MeasureText("raylib.com", 17) / 2,
-                440,
-                MeasureText("raylib.com", 17),
+                cx - MeasureText(student1, 18) / 2,
+                220,
+                MeasureText(student1, 18),
                 22
             };
-            DrawText("raylib.com", raylib.x, raylib.y, 17, link);
-            DrawText("EXTERNAL SOURCE", cx - MeasureText("EXTERNAL SOURCE", 20) / 2, 485, 20, RAYWHITE);
+
+            Rectangle github2 =
+            {
+                cx - MeasureText(student2, 18) / 2,
+                250,
+                MeasureText(student2, 18),
+                22
+            };
+
+            DrawText(student1, github1.x, github1.y, 18, link);
+            DrawText(student2, github2.x, github2.y, 18, link);
+
+            DrawLine(270, 275, 498, 275, Fade(accent, 0.18f));
+
+            DrawText(
+                "ADVISOR",
+                cx - MeasureText("ADVISOR", 20) / 2,
+                290, 20, RAYWHITE
+            );
+
+            DrawText(
+                "JYK",
+                cx - MeasureText("JYK", 18) / 2,
+                325, 18, muted
+            );
+
+            Rectangle advisor =
+            {
+                cx - MeasureText(advisorText, 17) / 2,
+                355,
+                MeasureText(advisorText, 17),
+                22
+            };
+
+            DrawText(
+                advisorText,
+                advisor.x, advisor.y, 17, link
+            );
+
+            DrawText(
+                "GAME LIBRARY",
+                cx - MeasureText("GAME LIBRARY", 20) / 2,
+                405, 20, RAYWHITE
+            );
+
+            Rectangle raylib =
+            {
+                cx - MeasureText(raylibText, 17) / 2,
+                440,
+                MeasureText(raylibText, 17),
+                22
+            };
+
+            DrawText(
+                raylibText,
+                raylib.x, raylib.y, 17, link
+            );
+
+            DrawText(
+                "EXTERNAL SOURCE",
+                cx - MeasureText("EXTERNAL SOURCE", 20) / 2,
+                485, 20, RAYWHITE
+            );
+
             Rectangle source =
             {
-                cx - MeasureText("opengameart.org", 18) / 2, 520, MeasureText("opengameart.org", 18), 22
+                cx - MeasureText(sourceText, 18) / 2,
+                520,
+                MeasureText(sourceText, 18),
+                22
             };
-            DrawText("opengameart.org", source.x, source.y, 18, link);
+
+            DrawText(
+                sourceText,
+                source.x, source.y, 18, link
+            );
+
             Rectangle back = {290, 565, 188, 34};
-            DrawRectangleRounded(back, 0.25f, 8, Fade(BLACK, 0.65f));
-            DrawRectangleRoundedLines(back, 0.25f, 8, Fade(RAYWHITE, 0.35f));
-            DrawText("ESC / M  :  BACK", back.x + (back.width - MeasureText("ESC / M  :  BACK", 16)) / 2, back.y + 8, 16, RAYWHITE);
+
+            DrawRectangleRounded(
+                back, 0.25f, 8,
+                Fade(BLACK, 0.65f)
+            );
+            DrawRectangleRoundedLines(
+                back, 0.25f, 8,
+                Fade(RAYWHITE, 0.35f)
+            );
+
+            DrawText(
+                "ESC / M  :  BACK",
+                back.x + (back.width -
+                          MeasureText("ESC / M  :  BACK", 16)) / 2,
+                back.y + 8, 16, RAYWHITE
+            );
+
             Vector2 mouse = GetMousePosition();
 
-            Rectangle links[] = {github1, github2, advisor, raylib, source};
+            Rectangle links[] =
+            {
+                github1, github2, advisor, raylib, source
+            };
 
             for (int i = 0; i < 5; i++)
             {
                 if (CheckCollisionPointRec(mouse, links[i]))
+                {
                     DrawRectangleRounded(
-                        links[i], 0.2f, 6, Fade(link, 0.10f)
+                        links[i], 0.2f, 6,
+                        Fade(link, 0.10f)
                     );
+
+                    DrawLine(
+                        links[i].x,
+                        links[i].y + links[i].height,
+                        links[i].x + links[i].width,
+                        links[i].y + links[i].height,
+                        link
+                    );
+                }
             }
 
             if (CheckCollisionPointRec(mouse, back))
+            {
                 DrawRectangleRounded(
-                    back, 0.25f, 8, Fade(WHITE, 0.10f)
+                    back, 0.25f, 8,
+                    Fade(WHITE, 0.10f)
                 );
+            }
 
             EndDrawing();
 
-            /* -------------------------------------------------
-               HYPERLINK ACTIONS
-               ------------------------------------------------- */
             if (mouseClicked(github1))
                 OpenURL("https://github.com/mmurrythm");
 
@@ -1701,7 +1817,6 @@ int main(void)
 
             continue;
         }
-
         if (screen == SCREEN_GAME)
         {
             if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_M))
@@ -1910,7 +2025,7 @@ int main(void)
             {
                 if (enemies[i].active)
                 {
-                    DrawTexture(enemyTexture, boardoffsetX + enemies->x * 32, boardoffsetY + enemies->y* 32, WHITE );
+                    DrawTexture(enemyTexture, boardoffsetX + enemies[i].x * 32, boardoffsetY + enemies[i].y* 32, WHITE );
                 }
             }
             DrawTexture( playerTexture, boardoffsetX + player.x * 32, boardoffsetY + player.y * 32, WHITE );
